@@ -26,15 +26,15 @@
 
 class _api
 {
-    constructor( opts = {} )
-    {
-        let defaults = { url: null, method: 'POST', data: {}, force_fetch: true };
-        this.opts = { ...defaults, ...opts };
-    }
+	constructor( opts = {} )
+	{
+		let defaults = { url: null, method: 'POST', data: {}, force_fetch: true, 'content_type': 'application/json' };
+		this.opts = { ...defaults, ...opts };
+	}
 
-    poll()
-    {
-        return new Promise(
+	poll()
+	{
+		return new Promise(
 			( resolve, reject ) =>
 			{
 				if ( !this.opts.url )
@@ -48,11 +48,20 @@ class _api
 				let fetchOptions = {
 					method: this.opts.method,
 					headers: {
-						'Content-Type': 'application/json',
+						'Content-Type': this.opts.content_type,
 						'auth_token': this.opts.auth_token
 					},
-					body: JSON.stringify( this.opts.data )
 				};
+
+				if( 'POST' == this.opts.method && 'application/json' == this.opts.content_type )
+				{
+					fetchOptions['body'] = JSON.stringify( this.opts.data );
+				}
+
+				if( 'POST' == this.opts.method && 'x-www-form-urlencoded' == this.opts.content_type )
+				{
+					fetchOptions['body'] = this.opts.data;
+				}
 
 				let beforeRequest = _config.get( '_api', 'beforeRequest' );
 				if( beforeRequest && 'function' == typeof beforeRequest )
@@ -104,10 +113,11 @@ class _api
 				.catch(
 					( error ) =>
 					{
+						console.table( error.stack );
 						new _log( this.opts.url + ' failure' );
 						return reject( error );
 					}
 				);
-        });
-    }
+		});
+	}
 }

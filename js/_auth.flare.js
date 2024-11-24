@@ -20,8 +20,8 @@ class _auth
 
 		let _defaults = {
 			form_id: null,
-			_mem_login: null,
-			_mem_password: null,
+			_mem_auth_login: null,
+			_mem_auth_password: null,
 			auth_endpoint: '/_auth/password',
 			auth_redirect_url: '/',
 			logout_redirect_url: '/_auth/logout'
@@ -63,7 +63,7 @@ class _auth
 					_data = $this.opts;
 				}
 
-				new _api({ url: $this.opts.auth_endpoint, data: _data })
+				new _api({ url: $this.opts.auth_endpoint, method: 'POST', data: _data })
 					.poll()
 					.then(
 						( _ret ) =>
@@ -111,6 +111,7 @@ class _auth
 					.catch(
 						( _xhr, _textStatus, _errorThrown ) =>
 						{
+							console.table(_xhr);
 							new _log( 'auth error' );
 							new _log( _xhr );
 							new _log( _textStatus );

@@ -14,15 +14,19 @@
 class _log
 {
 	constructor( _opts )
-	{		
-		let _defaults = { msg: 'No log message', publish: 'console.log' };
-		if( 'string' == typeof _opts )
+	{
+		let _defaults;
+		this.opts;
+		if( 'string' == typeof _opts || 'object' == typeof _opts )
 		{
-			_defaults.msg = _opts;
+			_opts = { msg: _opts, publish: 'console.log' };
+		}
+		else
+		{
+			_defaults = { msg: 'No log message', publish: 'console.log' };
 		}
 
 		this.opts = { ..._defaults, ..._opts };
-
 		this.log();
 	}
 

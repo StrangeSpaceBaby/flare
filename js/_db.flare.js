@@ -13,24 +13,24 @@
 
 class _db
 {
-    constructor( _opts = {} )
-    {
-        let _defaults = {
-            dbName: _config.get( '_db', 'dbName' ) ?? 'FlareDB',
-            storeName: _config.get( '_db', 'storeName' ) ?? 'FlareStore',
-            version: _config.get( '_db', 'version' ) ?? 1,
-            schemaUrl: _config.get( '_db', 'schemaUrl' ) ?? '/api/db-schema'
-        };
+	constructor( _opts = {} )
+	{
+		let _defaults = {
+			dbName: _config.get( '_db', 'dbName' ) ?? 'FlareDB',
+			storeName: _config.get( '_db', 'storeName' ) ?? 'FlareStore',
+			version: _config.get( '_db', 'version' ) ?? 1,
+			schemaUrl: _config.get( '_db', 'schemaUrl' ) ?? '/api/db-schema'
+		};
 
-        this.opts = { ..._defaults, ..._opts };
-        this.db = null;
-        this.schemaConfig = null;
-    }
+		this.opts = { ..._defaults, ..._opts };
+		this.db = null;
+		this.schemaConfig = null;
+	}
 
-    #fetchSchema()
-    {
+	#fetchSchema()
+	{
 		let $this = this;
-        return new Promise(
+		return new Promise(
 			( _resolve, _reject ) =>
 			{
 				new _api({ url: $this.opts.schemaUrl })
@@ -47,12 +47,12 @@ class _db
 				});
 			}
 		); 
-    }
+	}
 
-    #open()
-    {
+	#open()
+	{
 		let $this = this;
-        return new Promise(
+		return new Promise(
 			( _resolve, _reject ) =>
 			{
 				let request = indexedDB.open( $this.opts.dbName, $this.opts.version );
@@ -112,10 +112,10 @@ class _db
 				};
 			}
 		);
-    }
+	}
 
-    #applySchemaUpdate( db, transaction, update )
-    {
+	#applySchemaUpdate( db, transaction, update )
+	{
 		return new Promise(
 			( _resolve, _reject ) =>
 			{
@@ -143,149 +143,149 @@ class _db
 				return _resolve( `${update.action} performed` );
 			}
 		)
-    }
+	}
 
-    #close()
-    {
-        if( this.db )
-        {
-            this.db.close();
-            this.db = null;
-        }
-    }
+	#close()
+	{
+		if( this.db )
+		{
+			this.db.close();
+			this.db = null;
+		}
+	}
 
-    save( data, key = null )
-    {
-        return this.#open()
-            .then( () =>
-            {
-                return new Promise( ( resolve, reject ) =>
-                {
-                    let transaction = this.db.transaction([this.opts.storeName], 'readwrite');
-                    let store = transaction.objectStore( this.opts.storeName );
-                    let request = key ? store.put( data, key ) : store.put( data );
+	save( data, key = null )
+	{
+		return this.#open()
+			.then( () =>
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let transaction = this.db.transaction([this.opts.storeName], 'readwrite');
+					let store = transaction.objectStore( this.opts.storeName );
+					let request = key ? store.put( data, key ) : store.put( data );
 
-                    request.onerror = 
-                    () =>
-                    {
-                        reject( request.error );
-                    };
-                    request.onsuccess = 
-                    () =>
-                    {
-                        resolve( request.result );
-                    };
-                });
-            })
+					request.onerror = 
+					() =>
+					{
+						reject( request.error );
+					};
+					request.onsuccess = 
+					() =>
+					{
+						resolve( request.result );
+					};
+				});
+			})
 			.catch( ( error ) => { return reject( error ) } )
-            .finally( () => this.#close() );
-    }
+			.finally( () => this.#close() );
+	}
 
-    select( key )
-    {
-        return this.#open()
-            .then( () =>
-            {
-                return new Promise( ( resolve, reject ) =>
-                {
-                    let transaction = this.db.transaction([this.opts.storeName], 'readonly');
-                    let store = transaction.objectStore( this.opts.storeName );
-                    let request = store.get( key );
+	select( key )
+	{
+		return this.#open()
+			.then( () =>
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let transaction = this.db.transaction([this.opts.storeName], 'readonly');
+					let store = transaction.objectStore( this.opts.storeName );
+					let request = store.get( key );
 
-                    request.onerror = 
-                    () =>
-                    {
-                        reject( request.error );
-                    };
-                    request.onsuccess = 
-                    () =>
-                    {
-                        resolve( request.result );
-                    };
-                });
-            })
+					request.onerror = 
+					() =>
+					{
+						reject( request.error );
+					};
+					request.onsuccess = 
+					() =>
+					{
+						resolve( request.result );
+					};
+				});
+			})
 			.catch( ( error ) => { return reject( error ) } )
-            .finally( () => this.#close() );
-    }
+			.finally( () => this.#close() );
+	}
 
-    deleteFrom( key )
-    {
-        return this.#open()
-            .then( () =>
-            {
-                return new Promise( ( resolve, reject ) =>
-                {
-                    let transaction = this.db.transaction([this.opts.storeName], 'readwrite');
-                    let store = transaction.objectStore( this.opts.storeName );
-                    let request = store.delete( key );
+	deleteFrom( key )
+	{
+		return this.#open()
+			.then( () =>
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let transaction = this.db.transaction([this.opts.storeName], 'readwrite');
+					let store = transaction.objectStore( this.opts.storeName );
+					let request = store.delete( key );
 
-                    request.onerror = 
-                    () =>
-                    {
-                        reject( request.error );
-                    };
-                    request.onsuccess = 
-                    () =>
-                    {
-                        resolve();
-                    };
-                });
-            })
+					request.onerror = 
+					() =>
+					{
+						reject( request.error );
+					};
+					request.onsuccess = 
+					() =>
+					{
+						resolve();
+					};
+				});
+			})
 			.catch( ( error ) => { return reject( error ) } )
-            .finally( () => this.#close() );
-    }
+			.finally( () => this.#close() );
+	}
 
-    clear()
-    {
-        return this.#open()
-            .then( () =>
-            {
-                return new Promise( ( resolve, reject ) =>
-                {
-                    let transaction = this.db.transaction([this.opts.storeName], 'readwrite');
-                    let store = transaction.objectStore( this.opts.storeName );
-                    let request = store.clear();
+	clear()
+	{
+		return this.#open()
+			.then( () =>
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let transaction = this.db.transaction([this.opts.storeName], 'readwrite');
+					let store = transaction.objectStore( this.opts.storeName );
+					let request = store.clear();
 
-                    request.onerror = 
-                    () =>
-                    {
-                        reject( request.error );
-                    };
-                    request.onsuccess = 
-                    () =>
-                    {
-                        resolve();
-                    };
-                });
-            })
+					request.onerror = 
+					() =>
+					{
+						reject( request.error );
+					};
+					request.onsuccess = 
+					() =>
+					{
+						resolve();
+					};
+				});
+			})
 			.catch( ( error ) => { return reject( error ) } )
-            .finally( () => this.#close() );
-    }
+			.finally( () => this.#close() );
+	}
 
-    getAll()
-    {
-        return this.#open()
-            .then( () =>
-            {
-                return new Promise( ( resolve, reject ) =>
-                {
-                    let transaction = this.db.transaction([this.opts.storeName], 'readonly');
-                    let store = transaction.objectStore( this.opts.storeName );
-                    let request = store.getAll();
+	getAll()
+	{
+		return this.#open()
+			.then( () =>
+			{
+				return new Promise( ( resolve, reject ) =>
+				{
+					let transaction = this.db.transaction([this.opts.storeName], 'readonly');
+					let store = transaction.objectStore( this.opts.storeName );
+					let request = store.getAll();
 
-                    request.onerror = 
-                    () =>
-                    {
-                        reject( request.error );
-                    };
-                    request.onsuccess = 
-                    () =>
-                    {
-                        resolve( request.result );
-                    };
-                });
-            })
+					request.onerror = 
+					() =>
+					{
+						reject( request.error );
+					};
+					request.onsuccess = 
+					() =>
+					{
+						resolve( request.result );
+					};
+				});
+			})
 			.catch( ( error ) => { return reject( error ) } )
-            .finally( () => this.#close() );
-    }
+			.finally( () => this.#close() );
+	}
 }

@@ -1,6 +1,6 @@
 /*
  * _table.js - Manages table optiosn for filtering and column selection
- *             as well as granular sorting options.
+ *			 as well as granular sorting options.
  * 
  * Copyright (c) 2024 Greg Strange
  * 

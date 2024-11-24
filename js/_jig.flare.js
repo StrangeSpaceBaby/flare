@@ -33,12 +33,13 @@ class _jig
 					( _index, _elem ) =>
 					{
 						let _id = $( _elem ).attr( 'id' );
-						let _tpl = $( '#' + _id ).attr( 'data-tpl' );
+						let _elemId = '#' + _id;
+						let _tpl = $( _elemId ).attr( 'data-tpl' );
 						this.fetchTpl( _tpl )
 						.then(
 							( _content ) =>
 							{
-								$( '#' + _id ).html( _content );
+								$( _elemId ).html( _content );
 								$this.postPop( _id );
 							}
 						)
@@ -59,7 +60,10 @@ class _jig
 	postPop( _id )
 	{
 		new _log( 'postPop' );
-		$( ('#' + _id).replace( '##', '#' ) ).find( '.autoload' ).each(
+		new _log( _id );
+
+		_id = ( '#' + _id ).replace( '##', '#' );
+		$( _id ).find( '.autoload' ).each(
 			( _loadIndex, _loadElem ) =>
 			{
 				let _loadId = $( _loadElem ).attr( 'id' );
@@ -67,7 +71,7 @@ class _jig
 			}
 		);
 
-		$( ('#' + _id).replace( '##', '#' ) ).find( '.autoform' ).each(
+		$( _id ).find( '.autoform' ).each(
 			( _formIndex, _formElem ) =>
 			{
 				let _formId = $( _formElem ).attr( 'id' );
@@ -75,7 +79,7 @@ class _jig
 			}
 		);
 
-		$( ('#' + _id).replace( '##', '#' ) ).find( '.autotable' ).each(
+		$( _id ).find( '.autotable' ).each(
 			( _tableIndex, _tableElem ) =>
 			{
 				let _tableId = $( _tableElem ).attr( 'id' );
@@ -83,13 +87,9 @@ class _jig
 			}
 		);
 
-		new _log( 'postPop settoggle' );
-		new _log( ('#' + _id).replace( '##', '#' ) );
-		$( ('#' + _id).replace( '##', '#' ) ).find( '.autotoggle' ).each(
+		$( _id ).find( '.autotoggle' ).each(
 			( _toggleIndex, _toggleElem ) =>
 			{
-				new _log( 'toggling' );
-				new _log( _toggleElem );
 				let _toggleId = $( _toggleElem ).attr( 'id' );
 				new _toggle({ elem: '#' + _toggleId }).setToggle();
 			}

@@ -60,10 +60,7 @@ class _loader
 		}
 		else
 		{
-			if( '#' != _elemId.substring( 0, 1 ) )
-			{
-				_elemId = '#' + _elemId;
-			}
+			_elemId = ('#' + _elemId).replace('##', '#');
 		}
 
 		return new Promise(
@@ -79,11 +76,22 @@ class _loader
 					}
 
 					let _elem = $( _elemId );
-					let _src = !$this.opts.src ? _elem.attr( 'data-fl-src' ) : $this.opts.src;
+					let _src = !$this.opts.src ? _elem.attr( 'flare-src' ) : $this.opts.src;
+					if( !_src )
+					{
+						return _fail( 'no_src_for_api_call_in_load' );
+					}
+	
 					let _replaces = [];
-					let _tpl = !$this.opts.tpl ? _elem.attr( 'data-fl-tpl' ) : $this.opts.tpl;
-					let _populate = !$this.opts.populate ? _elem.attr( 'data-fl-populate' ) : $this.opts.populate;
-					let _emptyMsg = !$this.opts.when_empty ? _elem.attr( 'data-fl-when-empty' ) : $this.opts.when_empty;
+					let _tpl = !$this.opts.tpl ? _elem.attr( 'flare-tpl' ) : $this.opts.tpl;
+					let _populate = $this.opts.populate ?? _elem.attr( 'flare-populate' );
+					if( !_populate )
+					{
+						_populate = _elemId;
+					}
+					_populate = ('#' + _populate).replace('##','#');
+
+					let _emptyMsg = !$this.opts.when_empty ? _elem.attr( 'flare-when-empty' ) : $this.opts.when_empty;
 
 					let _hashRegex = /#[a-z\d\-_]+/ig;
 					_replaces = [ ..._src.matchAll( _hashRegex ) ];
@@ -98,14 +106,8 @@ class _loader
 						}
 					}
 
-					let _popTarget = $( '#' + _populate );
+					let _popTarget = $( _populate );
 					_popTarget.children().not( '.keep' ).remove();
-					_popTarget.append( '<div class="row"><div class="col-12 text-center pt-5"><i class="fad fad fa-spinner fa-spin fa-3x fa-fw text-primary"></i></div></div>' );
-
-					if( !_src )
-					{
-						return _fail( 'no_src_for_api_call_in_load' );
-					}
 
 					new _api({ url: _src, method: 'GET' })
 					.poll()
@@ -127,7 +129,7 @@ class _loader
 										{
 											_popTarget.append( new _jig({ tpl: _tpl, data: _item, default: $this.opts.default_value }).popTpl() );
 										}
-										new _jig().postPop( '#' + _populate );
+										new _jig().postPop( _populate );
 									}
 								}
 								else
@@ -144,9 +146,9 @@ class _loader
 							}
 							else if( _ret )
 							{
+								// Loading bare data into element like a full page injection
 								new _log( 'populate page' );
 								new _log( _ret );
-								// Loading bare data into element like a full page injection
 								_popTarget.html( _ret );
 
 								return _success( 'page loaded' );

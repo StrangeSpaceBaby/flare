@@ -14,21 +14,20 @@
 class _init
 {
 	#allflares = [
+		'_store',
 		'_log',
 		'_dom',
-		'_jig',
 		'_config',
+		'_jig',
 		'_growl',
+		'_table',
 		'_api',
 		'_loader',
-		'_form',
-		'_table',
-		'_toggle',
-		'_cal',
 		'_auth',
+		'_form',
+		'_toggle',
 		'_file',
-		'_follow',
-		'_store',
+		'_tab'
 	];
 
 	#loadedflares = [];
@@ -53,12 +52,12 @@ class _init
 					beforeRequest:
 					function( _opts, _fetchOpts )
 					{
-
+						_dom.removeClass( '.loading-state', 'd-none' );
 					},
 					afterRequest:
 					function( _return, _opts )
 					{
-
+						_dom.addClass( '.loading-state', 'd-none' );
 					}
 				},
 				_db:
@@ -76,18 +75,19 @@ class _init
 			}
 		};
 
-		if( !_opts.useSky )
+		this.opts = { ..._defaults, ..._opts };
+
+		if( !this.opts.useSky )
 		{
 			_defaults.baseSettingsUrl = '';
 		}
 
-		this.opts = { ..._defaults, ..._opts };
 		this.loadflares()
 			.then(
 				() =>
 				{
 					this.setupGlobalConfig();
-					this.loadBaseSettings().catch( ( response ) => { new log({ msg: response, publish: 'console.warn' }) });
+					this.loadBaseSettings().catch( ( response ) => { new _log({ msg: response, publish: 'console.warn' }) });
 					this.callAutoFunctions();
 				}
 			)
@@ -176,7 +176,7 @@ class _init
 
 	callAutoFunctions()
 	{
-		let flareOrder = [ '_loader', '_form', '_table', '_jig', '_toggle', '_cal' ];
+		let flareOrder = [ '_loader', '_form', '_table', '_jig', '_toggle' ];
 
 		for( let index in flareOrder )
 		{
@@ -204,9 +204,6 @@ class _init
 				case '_toggle':
 					new _toggle({}).autotoggle();
 					break;
-				case '_cal':
-					new _cal({}).autocal();
-					break;
 			}
 		}
 	}
@@ -223,13 +220,13 @@ class _init
 			.then( ( _response ) =>
 			{
 				new _store().put( 'base_settings', _response );
-				for( let _key in _response )
+				for( let _key in _response.data )
 				{
 					document.querySelectorAll( `.${_key}` ).forEach(
 						( elem, index ) => 
 						{
-							elem.textContent = _response[_key];
-							elem.value = _response[_key];
+							elem.innerHTML = _response.data[_key];
+							elem.value = _response.data[_key];
 						}
 					);
 				}
