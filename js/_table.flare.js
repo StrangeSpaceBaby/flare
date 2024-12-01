@@ -40,15 +40,15 @@ class _table
 
 		new _log( 'input[type=checkbox][name=filter_' + _vars.col + '][value="'+ _vars.value + '"]' );
 		new _log( $( '#' + this.opts.table ) );
-		new _log( '[data-filter-' + _vars.col + '="' + _vars.value + '"]' );
+		new _log( '[flare-filter-' + _vars.col + '="' + _vars.value + '"]' );
 
 		if( $( 'input[type=checkbox][name=filter_' + _vars.col + '][value="'+ _vars.value + '"]' ).prop( 'checked' ) )
 		{
-			$( '#' + this.opts.table ).find( '[data-filter-' + _vars.col + '="' + _vars.value + '"]' ).removeClass( 'd-none' );
+			$( '#' + this.opts.table ).find( '[flare-filter-' + _vars.col + '="' + _vars.value + '"]' ).removeClass( 'd-none' );
 		}
 		else
 		{
-			$( '#' + this.opts.table ).find( '[data-filter-' + _vars.col + '="' + _vars.value + '"]' ).addClass( 'd-none' );
+			$( '#' + this.opts.table ).find( '[flare-filter-' + _vars.col + '="' + _vars.value + '"]' ).addClass( 'd-none' );
 		}
 	}
 
@@ -69,7 +69,7 @@ class _table
 		new _log( _this.dataset.direction );
 
 		let _vals = {};
-		let _type = $( _table + ' .list-group-header' ).find( '[data-col="' + _sortCol + '"]' ).data( 'col-type' );
+		let _type = $( _table + ' .list-group-header' ).find( '[flare-col="' + _sortCol + '"]' ).data( 'col-type' );
 		new _log( 'type' );
 		new _log( _type );
 
@@ -87,7 +87,7 @@ class _table
 				break;
 		}
 
-		$( _table ).children().not( '.list-group-header' ).find( '[data-col="' + _sortCol + '"]' ).each(
+		$( _table ).children().not( '.list-group-header' ).find( '[flare-col="' + _sortCol + '"]' ).each(
 			function( _index, _col )
 			{
 				new _log( 'col' );
@@ -185,9 +185,9 @@ class _table
 	toggleHiddenCol( _col )
 	{
 		new _log( 'start_hidden' );
-		new _log( '#' + this.opts.table + ' *[data-col="' + _col + '"]' );
+		new _log( '#' + this.opts.table + ' *[flare-col="' + _col + '"]' );
 
-		$( '#' + this.opts.table + ' *[data-col="' + _col + '"]' ).toggleClass( 'd-none' );
+		$( '#' + this.opts.table + ' *[flare-col="' + _col + '"]' ).toggleClass( 'd-none' );
 
 		this.updateHiddenColToggle( _col );
 	}
@@ -252,7 +252,7 @@ class _table
 			_list.append( new _jig({ tpl: _tpl, data: { col: _col, label: _colDetails.label } }).popTpl() );
 			if( window.ux.tables[_table].cols_hidden.includes( _col ) )
 			{
-				$( '*[data-col="' + _col + '"]' ).addClass( 'd-none' ).data( 'on', 0 );
+				$( '*[flare-col="' + _col + '"]' ).addClass( 'd-none' ).data( 'on', 0 );
 				this.updateHiddenColToggle( _col );
 			}
 		}
@@ -361,8 +361,8 @@ class _table
 							new _log( 'hidden cols' );
 							new _log( _index );
 							new _log( _col );
-							new _log( '#' + _table + ' *[data-col="' + _col + '"]' );
-							$( '*[data-col="' + _col + '"]' ).addClass( 'd-none' );
+							new _log( '#' + _table + ' *[flare-col="' + _col + '"]' );
+							$( '*[flare-col="' + _col + '"]' ).addClass( 'd-none' );
 						}
 					);
 				}
@@ -370,7 +370,7 @@ class _table
 				for( let _i in window.ux.tables[_table].col_order )
 				{
 					let _col = window.ux.tables[_table].col_order[_i];
-					$( '*[data-col="' + _col + '"]' ).css( 'order', _i );
+					$( '*[flare-col="' + _col + '"]' ).css( 'order', _i );
 				}
 
 				return _success( 'table_rendered' );
@@ -429,36 +429,36 @@ class _table
 							_label = $( _elem ).html();
 						}
 
-						if( $( _elem ).attr( 'data-label' ) )
+						if( $( _elem ).attr( 'flare-label' ) )
 						{
-							_label = $( _elem ).attr( 'data-label' );
+							_label = $( _elem ).attr( 'flare-label' );
 						}
 
-						if( $( _elem ).attr( 'data-display-order' ) )
+						if( $( _elem ).attr( 'flare-sort-order' ) )
 						{
-							window.ux.tables[_tableName].col_order[$( _elem ).attr( 'data-display-order' )] = _col;
+							window.ux.tables[_tableName].col_order[$( _elem ).attr( 'flare-sort-order' )] = _col;
 						}
 						else
 						{
 							window.ux.tables[_tableName].col_order[_display_order] = _col;
 						}
 
-						$( _elem ).css( 'order', $( _elem ).attr( 'data-display-order' ) ? $( _elem ).attr( 'data-display-order' ) : _display_order );
+						$( _elem ).css( 'order', $( _elem ).attr( 'flare-sort-order' ) ? $( _elem ).attr( 'flare-sort-order' ) : _display_order );
 
 						let _sortable = true;
-						if( 'undefined' !== typeof $( _elem ).attr( 'data-sortable' ) )
+						if( 'undefined' !== typeof $( _elem ).attr( 'flare-sortable' ) )
 						{
-							_sortable = $( _elem ).attr( 'data-sortable' );
+							_sortable = $( _elem ).attr( 'flare-sortable' );
 						}
 
 						let _hidden = false;
-						if( 'undefined' !== typeof $( _elem ).attr( 'data-hidden' ) && !$( _elem ).attr( 'data-col-always-on' ) )
+						if( 'undefined' !== typeof $( _elem ).attr( 'flare-hidden' ) && !$( _elem ).attr( 'flare-col-always-on' ) )
 						{
-							_hidden = $( _elem ).attr( 'data-hidden' );
+							_hidden = $( _elem ).attr( 'flare-hidden' );
 							window.ux.tables[_tableName].cols_hidden.push( _col );
 						}
 
-						window.ux.tables[_tableName].cols[_col] = { label: _label, col: _col, type: $( _elem ).attr( 'data-col-type' ), display_order: _display_order, sortable: _sortable, hidden: _hidden };
+						window.ux.tables[_tableName].cols[_col] = { label: _label, col: _col, type: $( _elem ).attr( 'flare-col-type' ), display_order: _display_order, sortable: _sortable, hidden: _hidden };
 					}
 				);
 

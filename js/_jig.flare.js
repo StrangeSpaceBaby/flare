@@ -62,7 +62,11 @@ class _jig
 		new _log( 'postPop' );
 		new _log( _id );
 
-		_id = ( '#' + _id ).replace( '##', '#' );
+		if( '.' != _id.substring( 0, 1 ) )
+		{
+			_id = ( '#' + _id ).replace( '##', '#' );
+		}
+		
 		$( _id ).find( '.autoload' ).each(
 			( _loadIndex, _loadElem ) =>
 			{

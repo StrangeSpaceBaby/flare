@@ -52,13 +52,13 @@ class _dom
 		}
 	}
 
-	static val( elemId, value )
+	static val( selector, value )
 	{
 		let elem = document.querySelector( selector );
 
 		if( !elem )
 		{
-			new _log( `Element not found in DOM: ${elemId}` );
+			new _log( `Element not found in DOM: ${selector}` );
 			return null;
 		}
 
@@ -66,14 +66,14 @@ class _dom
 		{
 			// Get value
 			let result = elem.value;
-			new _log( `Getting value for ${elemId}: ${result}` );
+			new _log( `Getting value for ${selector}: ${result}` );
 			return result;
 		}
 		else
 		{
 			// Set value
 			elem.value = value;
-			new _log( `Setting value for ${elemId} to ${value}` );
+			new _log( `Setting value for ${selector} to ${value}` );
 			return value;
 		}
 	}

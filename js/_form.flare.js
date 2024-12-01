@@ -33,11 +33,8 @@ class _form
 		return new Promise(
 			( _success, _fail ) =>
 			{
-				let _selector = 'form.autoform';
-				if( $this.opts.autoform )
-				{
-					_selector = $this.opts.form_id;
-				}
+				let _formId = ('#' + $this.opts.form_id).replace('##','#');
+				let _selector = _formId ?? 'form.autoform';
 
 				new _log( 'autoform selector ' + _selector );
 				$( _selector ).each(
@@ -47,20 +44,21 @@ class _form
 						new _log( _elem );
 						new _log( $( _elem ) );
 
-						// These two lines allow for a dynamic setting of the form input and to use a generic form container
-						let _formId = $( _elem ).attr( 'data-form-input-id' ) ? $( _elem ).attr( 'data-form-input-id' ) : $( _elem ).attr( 'id' );
-						let _formSelector = $( _elem ).attr( 'id' );
+						// If no attribute for form id us the form's id
+						let _formId = $( _elem ).attr( 'flare-form-form-id' ) ?? $( _elem ).attr( 'id' );
 
 						new _log( 'autoform ' + _selector + ' formId -->' + _formId );
-						new _api({ url: '/_valid_field/form_fields/' + _formId }).poll().then(
+						new _api({ url: '/_valid_field/form_fields/' + _formId })
+							.poll()
+							.then(
 							( _ret ) =>
 							{
 								if( 1 == _ret.return )
 								{
 									new _log( 'autoform success' );
 
-									new _log('#' + _formSelector + '_fields');
-									let _cFormFields = $( '#' + _formSelector + '_fields' );
+									new _log('#' + _formId + '_fields');
+									let _cFormFields = $( '#' + _formId + '_fields' );
 									_cFormFields.empty();
 
 									if( 0 == _ret.count )
@@ -81,17 +79,17 @@ class _form
 												_field.default = '';
 											}
 
-											switch( _field.type )
+											let input_id = `${_formId}_${_field._field_id_name}`;
+											switch( _field._field_type )
 											{
 												case 'textarea':
-													_fieldLabel = '<label for="' + _field.id + '">' + _field.name + '</label>';
-													_fieldHtml = '<textarea name="' + _field.name + '" id="' + _field.id + '" class="form-control';
-													if( _field.required )
+													_fieldLabel = `<label for="${input_id}">${_field._field_label}</label>`;
+													_fieldHtml = `<textarea name="${_field._field_id_name}" id="${input_id}" class="form-control`;
+													if( _field._field_is_required )
 													{
 														_fieldHtml += " required";
 													}
-													_fieldHtml += '">' + _field.default + '</textarea>';
-
+													_fieldHtml += `">${_field._field_default_value ?? ''}</textarea>`;
 													break;
 												case 'email':
 												case 'password':
@@ -100,51 +98,53 @@ class _form
 												case 'datetime-local':
 												case 'number':
 												case 'text':
-													if( 'hidden' != _field.type )
+													_fieldLabel = `<label for="${input_id}">${_field._field_label}</label>`;
+													if( 'hidden' == _field._field_type )
 													{
-														_fieldLabel = '<label for="' + _field.id + '">' + _field.name + '</label>';
-													}
-													_fieldHtml = '<input type="' + _field.type + '" name="' + _field.name + '" id="' + _field.id + '" value="' + _field.default + '" class="form-control';
-													if( _field.required )
-													{
-														_fieldHtml += " required";
-													}
-													_fieldHtml += '" />';
-													break;
-												case 'checkbox':
-													_fieldLabel = '<label for="' + _field.id + '" class="form-check-label">' + _field.name + '</label><br />';
-													if( !_field.default )
-													{
-														_field.default = 1;
+														_fieldLabel = '';
 													}
 
-													_fieldHtml = '<input type="checkbox" name="' + _field.name + '" id="' + _field.id + '" value="' + _field.default + '" class="form-check-input';
-													if( _field.required )
+													_fieldHtml = `<input type="${_field._field_type}" name="${_field._field_id_name}" id="${input_id}" value="${_field._field_default_value ?? ''}" class="form-control`;
+													if( _field._field_is_required )
 													{
 														_fieldHtml += " required";
 													}
-													_fieldHtml += '" />';
+													_fieldHtml += '">';
+													break;
+												case 'checkbox':
+													_fieldLabel = `<label for="${input_id}" class="form-check-label">${_field._field_label}</label>`;
+													if( !_field._field_default_value )
+													{
+														_field._field_default_value = 1;
+													}
+
+													_fieldHtml = `<input type="checkbox" name="${_field._field_id_name}" id="${input_id}" value="${_field._field_default_value ?? ''}" class="form-check-input`;
+													if( _field._field_is_required )
+													{
+														_fieldHtml += " required";
+													}
+													_fieldHtml += '">';
 													break;
 												case 'select':
 													new _log( 'select autoform' );
 													new _log( _field );
-													_table = _field.name.split( '_' );
+													_table = _field._field_id_name.split( '_' );
 													if( 'fk' == _table.shift() && 'id' == _table.pop() )
 													{
 														_table = _table.join( '_' );
 													}
 
-													_fieldLabel = '<label for="' + _field.id + '"><a href="javascript:void(0);" onClick="new _loader({}).load( \'' + _field.id + '\' );">' + _field.name + '</a></label>';
-													_fieldHtml = '<select name="' + _field.name + '" id="' + _field.id + '" class="form-control">';
+													_fieldLabel = `<label for="${input_id}"><a href="javascript:void(0);" onClick="new _loader({}).load( '${input_id}' );">${_field._field_label}</a></label>`;
+													_fieldHtml = `<select name="${_field._field_id_name}" id="${input_id}" class="form-control" flare-src="/${_table}/list" flare-tpl="${input_id}_tpl">`;
 													_fieldHtml += '<option value="" class="keep">Select</option></select>';
-													_fieldHtml += '<template id="' + _field.id + '_tpl"><option value="~~' + _table + '_id~~">~~' + _table + '_name~~</option></template>';
+													_fieldHtml += `<template id="${input_id}_tpl"><option value="~~${_table}_id~~">~~${_table}_name~~</option></template>`;
 													break;
 											}
 
 											_cFormFields.append( '<div class="form-row">' + _fieldLabel + ' ' + _fieldHtml + '</div>' );
-											if( 'select' == _field.type && _field.src )
+											if( 'select' == _field._field_type )
 											{
-												new _loader({ src: _field.src, tpl: _field.id + '_tpl', populate: _field.id }).load( _field.id );
+												new _loader({}).load( input_id );
 											}
 										}
 									}

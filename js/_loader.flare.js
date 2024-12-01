@@ -89,7 +89,10 @@ class _loader
 					{
 						_populate = _elemId;
 					}
-					_populate = ('#' + _populate).replace('##','#');
+					if( '.' != _populate.substring( 0,1 ) )
+					{
+						_populate = ('#' + _populate).replace('##','#');
+					}
 
 					let _emptyMsg = !$this.opts.when_empty ? _elem.attr( 'flare-when-empty' ) : $this.opts.when_empty;
 
